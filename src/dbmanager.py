@@ -1,6 +1,7 @@
 import sqlite3
 
-class db_manager:
+class dbManager:
+
     def __init__(self, db_name):
         self.conn = sqlite3.connect(db_name)
 
@@ -28,4 +29,3 @@ class db_manager:
         c = self.conn.cursor()
         c.execute("UPDATE history set to_add=0")
         self.conn.commit()
-

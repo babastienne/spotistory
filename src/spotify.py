@@ -5,6 +5,7 @@ from datetime import datetime
 
 import spotipy
 import spotipy.util as util
+import spotipy.oauth2 as oauth2
 import json
 import track
 import time
@@ -12,68 +13,60 @@ from calendar import timegm
 from track import track
 
 
-scope = 'user-library-read'
+scope = 'user-library-read user-read-recently-played playlist-modify-public playlist-modify-private'
 
 class spotify:
 
-    def __init__(self, token, user):
-        self.token = token
-        self.user = user
-        self.PATTERN = "%Y-%m-%dT%H:%M:%S.%fZ"
+    def __init__(self, client_id, client_secret, username):
+        print client_id + " " + client_secret
+        client_credential_manager = oauth2.SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 
-    def getHistory(self):
-        if self.token:
-            sp = spotipy.Spotify(auth=self.token)
-            results = sp._get("me/player/recently-played", limit=50)
+        self.PATTERN = "%Y-%m-%dT%H:%M:%S.%fZ"
+        util.prompt_for_user_token(username, scope, client_id=client_id, client_secret=client_secret, redirect_uri="http://localhost:8888/callback/")
+        with open('.cache-siimacore', 'r') as myfile:
+            json_file = json.load(myfile)
+            self.token = json_file["access_token"]
+            self.refresh = json_file["refresh_token"]
+        self.sp = spotipy.Spotify(auth=self.token)
+        self.user = username
+
+    def check_token(self):
+        if(oauth2.SpotifyOAuth.is_token_expired(self.token)):
+            self.token = oauth2.SpotifyOAuth.refresh_access_token(self.refresh)
+
+
+    def get_history(self):
+            results = self.sp._get("me/player/recently-played", limit=50)
             tracks = []
             for item in results["items"]:
                 played_at = timegm(time.strptime(item["played_at"], self.PATTERN))
                 current = track(item["track"]["id"], item["track"]["uri"], played_at)
                 tracks.append(current)
             return tracks
-        else:
-            print "Can't get token for" + self.user
 
-    def createPlaylist(self, name):
-        if self.token and self.user:
+    def create_playlist(self, name):
+        results = self.sp.user_playlist_create(self.user, name)
+        return results
+
+    def add_tracks_playlist(self, playlist, tracks):
             try:
-                sp = spotipy.Spotify(auth=self.token)
-                results = sp.user_playlist_create(self.user, name)
+                print tracks
+                results = self.sp.user_playlist_add_tracks(self.user, playlist, tracks)
                 return results
             except Exception:
                 return None
-        else:
-            print "Can't get token for" + self.user
 
-    def addTracksPlaylist(self, playlist, tracks):
-        if self.token and self.user:
+    def get_playlist(self, playlist):
             try:
-                sp = spotipy.Spotify(auth=self.token)
-                results = sp.user_playlist_add_tracks(self.user, playlist, tracks)
+                results = self.sp.user_playlist(self.user)
                 print results
                 return json.loads(str(results).encode('unicode-escape'))
             except Exception:
                 return None
-        else:
-            print "Can't get token for" + self.user
 
-    def getPlaylist(self, playlist):
-        if self.token and self.user:
+    def get_all_playlists(self):
             try:
-                sp = spotipy.Spotify(auth=self.token)
-                results = sp.user_playlist(self.user)
-                print results
-                return json.loads(str(results).encode('unicode-escape'))
-            except Exception:
-                return None
-        else:
-            print "Can't get token for" + self.user
-
-    def getPlaylists(self):
-        if self.token and self.user:
-            try:
-                sp = spotipy.Spotify(auth=self.token)
-                results = sp.current_user_playlists()
+                results = self.sp.current_user_playlists()
                 playlists = []
                 for item in results["items"]:
                     playlists.append((item["name"], item["id"]))
@@ -81,11 +74,9 @@ class spotify:
 
             except Exception:
                 return None
-        else:
-            print "Can't get token for" + self.user
 
     def is_playlist_created(self, name):
-        playlists = self.getPlaylists()
+        playlists = self.get_all_playlists()
         if(name in playlists.viewkeys()):
             return (True, playlists[name])
         return (False, "no")
