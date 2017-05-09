@@ -2,3 +2,4 @@ conf/default-config.toml
 src/credentials.py
 src/.cache-*
 *.db
+*.pyc
