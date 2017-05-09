@@ -1,7 +1,7 @@
 from datetime import datetime
 
-
 class track:
+
     def __init__(self, id, uri, played_at):
         self.id = id
         self.uri = uri

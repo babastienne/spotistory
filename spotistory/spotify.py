@@ -17,22 +17,25 @@ scope = 'user-library-read user-read-recently-played playlist-modify-public play
 
 class spotify:
 
-    def __init__(self, client_id, client_secret, username):
-        print client_id + " " + client_secret
-        client_credential_manager = oauth2.SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
-
+    def __init__(self, client_id, client_secret, redirect_uri, username, access="", refresh=""):
         self.PATTERN = "%Y-%m-%dT%H:%M:%S.%fZ"
-        util.prompt_for_user_token(username, scope, client_id=client_id, client_secret=client_secret, redirect_uri="http://localhost:8888/callback/")
-        with open('.cache-siimacore', 'r') as myfile:
-            json_file = json.load(myfile)
-            self.token = json_file["access_token"]
-            self.refresh = json_file["refresh_token"]
+        self.oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri)
+        if(access == "" and refresh == ""):
+            util.prompt_for_user_token(username, scope, client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri)
+            with open('.cache-siimacore', 'r') as myfile:
+                json_file = json.load(myfile)
+                self.token = json_file["access_token"]
+                self.refresh = json_file["refresh_token"]
+                self.expiration = json_file["expires_at"]
+        else:
+            self.token = access
+            self.refresh = refresh
+            self.check_token()
         self.sp = spotipy.Spotify(auth=self.token)
         self.user = username
 
     def check_token(self):
-        if(oauth2.SpotifyOAuth.is_token_expired(self.token)):
-            self.token = oauth2.SpotifyOAuth.refresh_access_token(self.refresh)
+        self.token = self.oauth.refresh_access_token(self.refresh)
 
 
     def get_history(self):
