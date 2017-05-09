@@ -1,0 +1,12 @@
+title = "Default config for spotistory"
+
+[spotify]
+username = "siimacore"
+redirect_url = "http://localhost:8888/callback/"
+access_token = "BQB8sPc9zDFDHLQvKLOpyOORXUBGM1EQry8udPGq2jU3CHkcnWnVvnwka9AFWZBUSKCq2ye8QVy2nZahKfkX4UcaEgb6QkCRDXHLSa5h9OjO-nmb5n6GO9z6wwEbe4K6lIQPhF4sZfDdCXRGYFY-v51uDmex3Z1HEGnCkQnRzVJIWp_YiAngdGGL0-ladwdSyvR8mOty6TfFCYLKHNvZg4NEsSqdodHARuiD8jToDwfN8IEdKQ"
+client_id = "40dfe92eac4e4d6e9bba278cdd26c339"
+client_secret = "305d7fa72eae476385cded6bdc2ab4f0"
+refresh_token = "AQBz6zm1vRTGjmu1qsHq2YnJznm8gedR1FtkR2b86QWO9jD3piaYAqhG5Sra1BQM0djfvWlnXVV2tpH3XLk23Gagq3hIsDqvG-oT7mp4IiRMi4xxSrd4R0964FNr_IDvdc8"
+
+[database]
+name = "spotistory.db"
