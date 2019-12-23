@@ -6,6 +6,7 @@ import toml
 import spotify
 import authentication
 from dbmanager import dbManager
+import time
 
 here = os.path.dirname(__file__)
 os.chdir(here)
@@ -27,7 +28,9 @@ config = toml.load(config_file)
 auth = authentication(config, config_file)
 if args.init:
     authentication.launch()
-    return
+    while(not authentication.is_synchronized()):
+        time.sleep(2)
+    authentication.stop_server()    
 
 application = spotify.spotify(
     client_id=config["spotify"]["client_id"],

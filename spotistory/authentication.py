@@ -30,6 +30,7 @@ class authentication:
             "client_id": self.config["spotify"]["client_id"]
         }
         self.application = None
+        self.is_synchronized = False
 
     @app.route("/")
     def index(self):
@@ -63,10 +64,19 @@ class authentication:
 
     def launch(self):
         app.run(debug=True, port=self.config["server"]["port"])
+    
+    def is_synchronized(self):
+        return self.is_synchronized
+    
+    def stop_server(self):
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        func()
 
     @app.route("/synchro")
     def synchronize(self):
         with open(self.config_file, 'w') as myfile:
             toml.dump(self.config, myfile)
-
+        self.is_synchronized = True
         return render_template("index.html")
