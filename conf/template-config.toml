@@ -1,12 +1,19 @@
 title = "Template config for spotistory"
 
 [spotify]
-username = 
-redirect_url = 
+redirect_uri = 
 access_token = 
 client_id = 
 client_secret = 
 refresh_token = 
+token_url = "https://accounts.spotify.com/api/token"
+auth_url = "https://accounts.spotify.com/authorize"
+api_base_url = "https://api.spotify.com"
+api_version = "v1"
+
+[server]
+url = "http://127.0.0.1"
+port = "8080"
 
 [database]
 name = "spotistory.db"

@@ -16,31 +16,18 @@ class authentication:
         self.config = config
         self.config_file = config_file
 
-        #  Client Keys
-        self.CLIENT_ID = config["spotify"]["client_id"]
-        self.CLIENT_SECRET = config["spotify"]["client_secret"]
-
-        # Spotify URLS
-        self.SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
-        self.SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
-        self.SPOTIFY_API_BASE_URL = "https://api.spotify.com"
-        self.API_VERSION = "v1"
-        self.SPOTIFY_API_URL = "{}/{}".format(self.SPOTIFY_API_BASE_URL, self.API_VERSION)
+        # Spotify URL API
+        self.spotify_api_base_url = "{}/{}".format(self.config["spotify"]["api_base_url"], self.config["spotify"]["api_version"])
 
         # Server-side Parameters
-        self.CLIENT_SIDE_URL = "http://127.0.0.1"
-        self.PORT = 8080
-        self.REDIRECT_URI = "{}:{}/callback/q".format(self.CLIENT_SIDE_URL, self.PORT)
-        self.SCOPE = 'user-library-read user-read-recently-played playlist-modify-public playlist-modify-private'
-        self.STATE = ""
-        self.SHOW_DIALOG_bool = True
-        self.SHOW_DIALOG_str = str(self.SHOW_DIALOG_bool).lower()
+        self.config["spotify"]["redirect_uri"] = "{}:{}/callback/q".format(self.config["server"]["url"], self.config["server"]["port"])
+        self.scope = 'user-library-read user-read-recently-played playlist-modify-public playlist-modify-private'
 
         self.auth_query_parameters = {
             "response_type": "code",
-            "redirect_uri": self.REDIRECT_URI,
-            "scope": self.SCOPE,
-            "client_id": self.CLIENT_ID
+            "redirect_uri": self.config["spotify"]["redirect_uri"],
+            "scope": self.scope,
+            "client_id": self.config["spotify"]["client_id"]
         }
         self.application = None
 
@@ -48,7 +35,7 @@ class authentication:
     def index(self):
         # Auth Step 1: Authorization
         url_args = "&".join(["{}={}".format(key, quote(val)) for key, val in self.auth_query_parameters.items()])
-        auth_url = "{}/?{}".format(self.SPOTIFY_AUTH_URL, url_args)
+        auth_url = "{}/?{}".format(self.config["spotify"]["auth_url"], url_args)
         return redirect(auth_url)
 
     @app.route("/callback/q")
@@ -58,38 +45,28 @@ class authentication:
         code_payload = {
             "grant_type": "authorization_code",
             "code": str(auth_token),
-            "redirect_uri": self.REDIRECT_URI,
-            'client_id': self.CLIENT_ID,
-            'client_secret': self.CLIENT_SECRET,
+            "redirect_uri": self.config["spotify"]["redirect_uri"],
+            'client_id': self.config["spotify"]["client_id"],
+            'client_secret': self.config["spotify"]["client_secret"],
         }
-        post_request = requests.post(self.SPOTIFY_TOKEN_URL, data=code_payload)
+        post_request = requests.post(self.config["spotify"]["token_url"], data=code_payload)
 
         # Auth Step 5: Tokens are Returned to Application
         response_data = json.loads(post_request.text)
         self.config["spotify"]["access_token"] = response_data["access_token"]
         self.config["spotify"]["refresh_token"] = response_data["refresh_token"]
-        self.config["spotify"]["expires_in"] = response_data["expires_in"]
 
         # Auth Step 6: Use the access token to access Spotify API
         authorization_header = {"Authorization": "Bearer {}".format(self.config["spotify"]["access_token"])}
 
-        # Get profile data
-        user_profile_api_endpoint = "{}/me".format(self.SPOTIFY_API_URL)
-        profile_response = requests.get(user_profile_api_endpoint, headers=authorization_header)
-        profile_data = json.loads(profile_response.text)
-
-        # Get user playlist data
-        playlist_api_endpoint = "{}/playlists".format(profile_data["href"])
-        playlists_response = requests.get(playlist_api_endpoint, headers=authorization_header)
-        playlist_data = json.loads(playlists_response.text)
-
-        # Combine profile and playlist data to display
-        display_arr = [profile_data] + playlist_data["items"]
-        return render_template("index.html", sorted_array=display_arr)
+        return render_template("index.html")
 
     def launch(self):
-        app.run(debug=True, port=self.PORT)
+        app.run(debug=True, port=self.config["server"]["port"])
 
+    @app.route("/synchro")
     def synchronize(self):
         with open(self.config_file, 'w') as myfile:
-            toml.dump(config, myfile)
+            toml.dump(self.config, myfile)
+
+        return render_template("index.html")
