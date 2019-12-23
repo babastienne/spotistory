@@ -4,6 +4,7 @@ import argparse
 import os
 import toml
 import spotify
+import authentication
 from dbmanager import dbManager
 
 here = os.path.dirname(__file__)
@@ -18,12 +19,18 @@ parser.add_argument("--config", help="Specifies the config file to use")
 args = parser.parse_args()
 
 # On charge la config
+config_file = args.config if args.config else default_file_config
+# if args.config and os.path.isfile(args.config):
+#     config = toml.load(args.config)
+# else:
+    config = toml.load(config_file)
 
-if args.config and os.path.isfile(args.config):
-    config = toml.load(args.config)
+# authenticate the user
+auth = authentication(config, config_file)
+if args.init:
+    authentication.launch()
 else:
-    config = toml.load(default_file_config)
-
+    authentication.reconnect()
 
 # On créer le handler de l'api Spotify
 if ("refresh_token" in config["spotify"] and "access_token" in config["spotify"]):
@@ -43,8 +50,8 @@ else:
     config["spotify"]["expires_at"] = application.expiration
 
 # On stock les infos utiles
-with open(default_file_config, 'w') as myfile:
-    toml.dump(config, myfile)
+# with open(default_file_config, 'w') as myfile:
+#     toml.dump(config, myfile)
 
 
 # On créer la bdd et on l'initialise (création des tables)
