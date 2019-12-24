@@ -7,26 +7,24 @@ class dbManager:
         self.conn = sqlite3.connect(db_name)
 
     def init_db(self):
-        self.create_table("history")
-        self.create_table("playlist")
+        self.create_table()
 
-    def create_table(self, name):
-        with open('scripts/create_' + name + '.sql', 'r') as myfile:
+    def create_table(self):
+        with open('scripts/create_tables.sql', 'r') as myfile:
             data = myfile.read().replace('\n', ' ')
         c = self.conn.cursor()
-        c.execute(data)
+        c.executescript(data)
         self.conn.commit()
 
-    def add_tracks(self, tracks):
+    def insert_values(self, table_name, elems):
         c = self.conn.cursor()
-        for track in tracks:
-            c.execute("INSERT INTO history VALUES(?,?,?,?,?)", track.to_tuple())
-        self.conn.commit()
-
-    def get_non_added_tracks(self):
-        return self.conn.execute("SELECT * FROM history WHERE to_add=1 ORDER BY played_at ASC").fetchall()
-
-    def set_added(self):
-        c = self.conn.cursor()
-        c.execute("UPDATE history set to_add=0")
+        for elem in elems:
+            values = elem.to_tuple()
+            c.execute(
+                "INSERT INTO {} VALUES (?{})".format(
+                    table_name,
+                    "".join([',?' for k in range(len(values) - 1)])
+                ),
+                values
+            )
         self.conn.commit()

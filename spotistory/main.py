@@ -37,8 +37,8 @@ application = spotify.spotify(
 db_manager = dbManager(config["database"]["name"])
 db_manager.init_db()
 
-tracks = application.get_history()
-db_manager.add_tracks(tracks)
-tracks_to_add = db_manager.get_non_added_tracks()
-
-db_manager.set_added()
+# On récupère les données et ajoute le tout en base
+historics = application.get_history()
+db_manager.insert_values('artist', application.get_history_related_artists())
+db_manager.insert_values('track', application.get_history_related_tracks())
+db_manager.insert_values('history', historics)
