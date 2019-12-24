@@ -1,0 +1,17 @@
+repos:
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: '3.7.9'
+    hooks:
+    -   id: flake8
+        exclude: (manage.py|setup.py|settings/dev.py)
+        args: ['--ignore=E501,F403,F405,W503']
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    -   id: check-yaml
+    -   id: check-toml
+    -   id: check-xml
+    -   id: check-json
+    -   id: check-case-conflict
+    -   id: check-byte-order-marker
+    -   id: check-ast
