@@ -1,0 +1,6 @@
+toml
+spotipy
+argparse
+dbmanager
+flask
+requests
