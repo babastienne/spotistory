@@ -8,7 +8,7 @@ class Track:
         self.title = title
 
     def __str__(self):
-        return "{} (id={}) by {}".format(self.title, self.id, self.artist_id)
+        return '{} (id={}) by {}'.format(self.title, self.id, self.artist_id)
 
     def to_tuple(self):
         return (self.id, self.uri, self.duration, self.artist_id, self.title)

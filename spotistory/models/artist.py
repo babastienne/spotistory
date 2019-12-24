@@ -6,7 +6,7 @@ class Artist:
         self.title = title
 
     def __str__(self):
-        return "{} (id={})".format(self.title, self.id)
+        return '{} (id={})'.format(self.title, self.id)
 
     def to_tuple(self):
         return (self.id, self.uri, self.title)

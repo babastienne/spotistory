@@ -21,9 +21,9 @@ class dbManager:
         for elem in elems:
             values = elem.to_tuple()
             c.execute(
-                "INSERT INTO {} VALUES (?{})".format(
+                'INSERT INTO {} VALUES (?{})'.format(
                     table_name,
-                    "".join([',?' for k in range(len(values) - 1)])
+                    ''.join([',?' for k in range(len(values) - 1)])
                 ),
                 values
             )
