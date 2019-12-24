@@ -1,37 +1,18 @@
-## Welcome to GitHub Pages
+## Spotistory
 
-You can use the [editor on GitHub](https://github.com/babastienne/spotistory/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+This little project is made in order to keep into a databse some informations about my listenings on spotify.
+Using the spotify API as well as spotipy and flask, it fetch the history of listening of a user. It also keep into separate table informations about tracks played, artists and genres.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Run
 
-### Markdown
+#### Initialize
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+First of all don't forget to install the requirements for the project by running `pip install -r requirements.txt` !
 
-```markdown
-Syntax highlighted code block
+You should insert into the config file some informations : client_id and client_secret.
+Then in order to generate an access token for your profile you need to run the program with the command `python path/to/program/main.py --init`. the init parameter will launch a server running on the address in the config file (default is `http://127.0.0.1:8080`).
+visit the address and it should return a message indicating that everything went fine. If you visit your configuration file it should now be filled with an access_token and a refresh_token as well. 
 
-# Header 1
-## Header 2
-### Header 3
+#### Launch the synchronization
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/babastienne/spotistory/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+After the init step, you can now launch the program `python /path/to/program/main.py`. It will fetch the most recently played songs on your profile and stock them into a database (path to the database can be put in the configuration file).
