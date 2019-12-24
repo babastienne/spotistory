@@ -1,12 +1,13 @@
 from datetime import datetime
 
+
 class track:
 
     def __init__(self, id, uri, played_at):
         self.id = id
         self.uri = uri
         self.played_at = played_at
-        self.to_add = True;
+        self.to_add = True
         self.week_id = datetime.fromtimestamp(played_at).isocalendar()[1]
 
     def __str__(self):

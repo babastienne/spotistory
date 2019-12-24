@@ -1,5 +1,6 @@
 import sqlite3
 
+
 class dbManager:
 
     def __init__(self, db_name):
@@ -16,7 +17,7 @@ class dbManager:
         c.execute(data)
         self.conn.commit()
 
-    def add_tracks(self,  tracks):
+    def add_tracks(self, tracks):
         c = self.conn.cursor()
         for track in tracks:
             c.execute("INSERT INTO history VALUES(?,?,?,?,?)", track.to_tuple())

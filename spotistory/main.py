@@ -6,18 +6,13 @@ import toml
 import spotify
 import authentication
 from dbmanager import dbManager
-import time
-
-here = os.path.dirname(__file__)
-os.chdir(here)
-print here
 
 # Ici on gère les arguments d'appel du script
 
-default_file_config = "conf/default-config.toml"
+default_file_config = "/home/bastien/Documents/99-Perso/spotistory/conf/default-config.toml"
 parser = argparse.ArgumentParser(description="Manage a history of the music you listen on Spotify")
 parser.add_argument("--config", help="Specifies the config file to use")
-parser.add_argument("--init", help="For the first connection launch an authentication server")
+parser.add_argument("--init", help="For the first connection launch an authentication server to get an access_token.", action='store_true')
 args = parser.parse_args()
 
 # On charge la config
@@ -25,19 +20,17 @@ config_file = args.config if args.config and os.path.isfile(args.config) else de
 config = toml.load(config_file)
 
 # authenticate the user if not already done
-auth = authentication(config, config_file)
+authentication.init(config, config_file)
 if args.init:
     authentication.launch()
-    while(not authentication.is_synchronized()):
-        time.sleep(2)
-    authentication.stop_server()    
+if not args.init and config["spotify"]["access_token"] == "":
+    raise Exception("No token provided. To generate a token please run the program with the '--init' parameter.")
+
+here = os.path.dirname(__file__)
+os.chdir(here)
 
 application = spotify.spotify(
-    client_id=config["spotify"]["client_id"],
-    client_secret=config["spotify"]["client_secret"],
-    redirect_uri=config["spotify"]["redirect_uri"],
-    access_token=config["spotify"]["access_token"],
-    refresh_token=config["spotify"]["refresh_token"]
+    config=config["spotify"]
 )
 
 # On créer la bdd et on l'initialise (création des tables)
