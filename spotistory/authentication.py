@@ -11,8 +11,8 @@ def init(conf, conf_file):
     global config, config_file, auth_query_parameters, synchronized
     config = conf
     config_file = conf_file
-
-    config['spotify']['redirect_uri'] = 'http://{}:{}/callback/q'.format(config['server']['host'], config['server']['port'])
+    if config['spotify']['redirect_uri'] == "":
+        config['spotify']['redirect_uri'] = 'http://{}:{}/callback/q'.format(config['server']['host'], config['server']['port'])
     scope = 'user-library-read user-read-recently-played playlist-modify-public playlist-modify-private'
 
     auth_query_parameters = {
