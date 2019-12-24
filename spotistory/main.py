@@ -9,7 +9,7 @@ from dbmanager import dbManager
 
 # Ici on gère les arguments d'appel du script
 
-default_file_config = "/home/bastien/Documents/99-Perso/spotistory/conf/default-config.toml"
+default_file_config = "conf/default-config.toml"
 parser = argparse.ArgumentParser(description="Manage a history of the music you listen on Spotify")
 parser.add_argument("--config", help="Specifies the config file to use")
 parser.add_argument("--init", help="For the first connection launch an authentication server to get an access_token.", action='store_true')
