@@ -1,11 +1,11 @@
 title = "Template config for spotistory"
 
 [spotify]
-redirect_uri = 
-access_token = 
-client_id = 
-client_secret = 
-refresh_token = 
+redirect_uri = ""
+access_token = ""
+client_id = ""
+client_secret = ""
+refresh_token = ""
 token_url = "https://accounts.spotify.com/api/token"
 auth_url = "https://accounts.spotify.com/authorize"
 api_base_url = "https://api.spotify.com"
