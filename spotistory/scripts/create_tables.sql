@@ -29,10 +29,20 @@ CREATE TABLE IF NOT EXISTS track
   FOREIGN KEY(artist_id) REFERENCES artist(id)
 );
 
+CREATE TABLE IF NOT EXISTS user
+(
+  display_name TEXT NOT NULL,
+  id TEXT PRIMARY KEY ON CONFLICT IGNORE,
+  uri TEXT NOT NULL,
+  followers INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS history
 (
   track_id TEXT NOT NULL,
   played_at DATETIME,
-  UNIQUE(track_id, played_at) ON CONFLICT IGNORE,
-  FOREIGN KEY(track_id) REFERENCES track(id)
+  user_id TEXT,
+  UNIQUE(track_id, played_at, user_id) ON CONFLICT IGNORE,
+  FOREIGN KEY(track_id) REFERENCES track(id),
+  FOREIGN KEY (user_id) REFERENCES user(id)
 );

@@ -9,7 +9,7 @@ from dbmanager import dbManager
 
 # Ici on gère les arguments d'appel du script
 
-default_file_config = 'conf/default-config.toml'
+default_file_config = '/home/bastien/Documents/99-Perso/spotistory/conf/default-config.toml'
 parser = argparse.ArgumentParser(description='Manage a history of the music you listen on Spotify')
 parser.add_argument('--config', help='Specifies the config file to use')
 parser.add_argument('--init', help='For the first connection launch an authentication server to get an access_token.', action='store_true')
@@ -36,6 +36,16 @@ application = spotify.spotify(
 # On créer la bdd et on l'initialise (création des tables)
 db_manager = dbManager(config['database']['name'])
 db_manager.init_db()
+
+# Si on ne connait pas encore l'utilisateur courant alors on récupère son profil
+if config['spotify']['user_id'] == '':
+    user = application.get_user_profile()
+    config['spotify']['user_id'] = user.id
+    # On écrit dans le fichier de config l'id de l'utilisateur
+    with open(config_file, 'w') as myfile:
+        toml.dump(config, myfile)
+    # On créé l'user dans la base
+    db_manager.insert_values('user', [user])
 
 # On récupère les données et ajoute le tout en base
 historics = application.get_history()

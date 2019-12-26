@@ -2,7 +2,7 @@
 
 import spotipy
 import spotipy.oauth2 as oauth2
-from models import artist, track, history
+from models import artist, track, history, user
 import time
 from calendar import timegm
 
@@ -25,11 +25,22 @@ class spotify:
         self.artists = []
         self.tracks = []
         self.historics = []
+        self.user_id = config['user_id']
 
     def check_token(self):
         resp = self.oauth.refresh_access_token(self.refresh)
         self.token = resp['access_token']
         self.refresh = resp['refresh_token']
+
+    def get_user_profile(self):
+        result = self.sp.me()
+        self.user_id = result['id']
+        return user.User(
+            self.user_id,
+            result['display_name'],
+            result['followers']['total'],
+            result['uri']
+        )
 
     def get_history(self):
         results = self.sp._get('me/player/recently-played', limit=50)
@@ -59,7 +70,8 @@ class spotify:
             historics.append(
                 history.History(
                     item['track']['id'],
-                    timegm(time.strptime(item['played_at'], self.PATTERN))
+                    timegm(time.strptime(item['played_at'], self.PATTERN)),
+                    self.user_id
                 )
             )
         # save data

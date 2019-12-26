@@ -1,6 +1,7 @@
 title = "Template config for spotistory"
 
 [spotify]
+user_id = ""
 redirect_uri = ""
 access_token = ""
 client_id = ""
